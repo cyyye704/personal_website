@@ -1,0 +1,326 @@
+---
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import MethodCard from "../components/MethodCard.astro";
+import PlatformLink from "../components/PlatformLink.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import ResourceGroup from "../components/ResourceGroup.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import {
+  methodologies,
+  navItems,
+  news,
+  platforms,
+  projects,
+  resources,
+  site,
+} from "../data/site";
+---
+
+<BaseLayout>
+  <div class="page-shell" id="top">
+    <Header />
+
+    <main>
+      <section class="hero">
+        <div class="container hero-inner">
+          <div class="hero-copy">
+            <p class="eyebrow">Personal Site / Research Log</p>
+            <h1>{site.title}</h1>
+            <p class="hero-description">{site.description}</p>
+            <div class="hero-actions" aria-label="页面栏目导航">
+              {navItems.map((item) => <a href={item.href}>{item.label}</a>)}
+            </div>
+          </div>
+
+          <div class="signal-panel" aria-label="个人方向概览">
+            <div>
+              <span>Focus</span>
+              <strong>AI × Wireless</strong>
+            </div>
+            <div>
+              <span>Mode</span>
+              <strong>Engineering Practice</strong>
+            </div>
+            <div>
+              <span>Horizon</span>
+              <strong>Long-term Systems</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="projects">
+        <div class="container">
+          <SectionHeading
+            eyebrow="Projects"
+            title="项目"
+            lede="记录研究探索、工程仿真和个人系统建设。这里先放占位项目，后续可替换为真实仓库、论文或笔记链接。"
+          />
+          <div class="grid two">
+            {projects.map((project) => <ProjectCard {...project} />)}
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="methodology">
+        <div class="container">
+          <SectionHeading
+            eyebrow="Methodology"
+            title="方法论"
+            lede="沉淀关于决策、注意力、学习系统和项目推进的长期思考。"
+          />
+          <div class="grid four methodology-grid">
+            {
+              methodologies.map((title, index) => (
+                <MethodCard title={title} index={index} />
+              ))
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="resources">
+        <div class="container">
+          <SectionHeading
+            eyebrow="Resources"
+            title="资料推荐"
+            lede="按主题整理书籍、课程、工具和网站，方便后续扩展成长期资料库。"
+          />
+          <div class="grid two">
+            {
+              resources.map((group) => (
+                <ResourceGroup category={group.category} items={group.items} />
+              ))
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="platforms">
+        <div class="container">
+          <SectionHeading
+            eyebrow="Platforms"
+            title="自媒体平台"
+            lede="把公开输出、代码项目和长文内容集中到一个简洁入口。"
+          />
+          <div class="grid three">
+            {platforms.map((platform) => <PlatformLink {...platform} />)}
+          </div>
+        </div>
+      </section>
+
+      <section class="section news-section" id="news">
+        <div class="container">
+          <SectionHeading
+            eyebrow="News"
+            title="新闻"
+            lede="这里用于记录个人动态和更新日志，不接入外部实时新闻源。"
+          />
+          <ol class="timeline" aria-label="个人动态">
+            {
+              news.map((item) => (
+                <li>
+                  <time>{item.date}</time>
+                  <span>{item.text}</span>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+      </section>
+    </main>
+
+    <Footer />
+  </div>
+</BaseLayout>
+
+<style>
+  .hero {
+    min-height: 100vh;
+    padding: calc(var(--header-height) + 84px) 0 92px;
+  }
+
+  .hero-inner {
+    display: grid;
+    min-height: calc(100vh - var(--header-height) - 176px);
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 48px;
+    align-items: center;
+  }
+
+  .hero-copy {
+    min-width: 0;
+  }
+
+  .hero-description {
+    max-width: 680px;
+    margin-bottom: 34px;
+    color: var(--text-muted);
+    font-size: clamp(1rem, 2vw, 1.2rem);
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .hero-actions a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 42px;
+    padding: 9px 14px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--text);
+    font-weight: 700;
+    transition:
+      background-color 140ms ease,
+      border-color 140ms ease,
+      transform 140ms ease;
+  }
+
+  .hero-actions a:hover {
+    transform: translateY(-2px);
+    border-color: var(--line-strong);
+    background: var(--surface);
+  }
+
+  .signal-panel {
+    position: relative;
+    display: grid;
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background:
+      linear-gradient(135deg, rgba(17, 17, 17, 0.05), transparent 45%),
+      rgba(255, 255, 255, 0.78);
+    box-shadow: 0 20px 60px rgba(17, 17, 17, 0.06);
+  }
+
+  .signal-panel::before {
+    position: absolute;
+    inset: 16px;
+    border: 1px solid rgba(17, 17, 17, 0.08);
+    border-radius: 5px;
+    content: "";
+    pointer-events: none;
+  }
+
+  .signal-panel div {
+    display: grid;
+    gap: 6px;
+    padding: 28px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .signal-panel div:last-child {
+    border-bottom: 0;
+  }
+
+  .signal-panel span {
+    color: var(--text-muted);
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+  }
+
+  .signal-panel strong {
+    font-size: 1.05rem;
+  }
+
+  .methodology-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .news-section {
+    padding-bottom: 88px;
+  }
+
+  .timeline {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--line);
+  }
+
+  .timeline li {
+    display: grid;
+    grid-template-columns: 148px minmax(0, 1fr);
+    gap: 24px;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  time {
+    color: var(--text-muted);
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  }
+
+  @media (max-width: 960px) {
+    .hero-inner {
+      grid-template-columns: 1fr;
+      align-items: end;
+    }
+
+    .signal-panel {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .signal-panel div {
+      border-right: 1px solid var(--line);
+      border-bottom: 0;
+    }
+
+    .signal-panel div:last-child {
+      border-right: 0;
+    }
+
+    .methodology-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hero {
+      min-height: auto;
+      padding: calc(var(--header-height) + 56px) 0 64px;
+    }
+
+    .hero-inner {
+      min-height: auto;
+      gap: 36px;
+    }
+
+    .hero-actions a {
+      flex: 1 1 calc(50% - 10px);
+      justify-content: center;
+    }
+
+    .signal-panel,
+    .methodology-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .signal-panel div {
+      padding: 22px;
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .signal-panel div:last-child {
+      border-bottom: 0;
+    }
+
+    .timeline li {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+  }
+</style>

@@ -1,0 +1,56 @@
+---
+import { site } from "../data/site";
+---
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <p>© 2026 {site.owner}. All rights reserved.</p>
+    <div>
+      <a href={`mailto:${site.email}`}>{site.email}</a>
+      <a href={site.github}>GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.68);
+  }
+
+  .footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 28px 0;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  div div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 14px;
+  }
+
+  a:hover {
+    color: var(--text);
+  }
+
+  @media (max-width: 620px) {
+    .footer-inner {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    div div {
+      justify-content: flex-start;
+    }
+  }
+</style>

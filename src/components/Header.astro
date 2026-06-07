@@ -1,0 +1,107 @@
+---
+import { navItems, site } from "../data/site";
+---
+
+<header class="site-header">
+  <nav class="container nav" aria-label="主导航">
+    <a class="brand" href="#top" aria-label="返回首页">
+      <span class="brand-mark">YCY</span>
+      <span>{site.owner}</span>
+    </a>
+    <div class="nav-links">
+      {navItems.map((item) => <a href={item.href}>{item.label}</a>)}
+    </div>
+  </nav>
+</header>
+
+<style>
+  .site-header {
+    position: fixed;
+    z-index: 20;
+    top: 0;
+    right: 0;
+    left: 0;
+    min-height: var(--header-height);
+    border-bottom: 1px solid rgba(17, 17, 17, 0.09);
+    background: rgba(247, 247, 245, 0.86);
+    backdrop-filter: blur(18px);
+  }
+
+  .nav {
+    display: flex;
+    min-height: var(--header-height);
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .brand-mark {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    border: 1px solid var(--text);
+    border-radius: 6px;
+    color: var(--surface);
+    background: var(--text);
+    font-size: 0.74rem;
+  }
+
+  .nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+
+  .nav-links a {
+    padding: 8px 10px;
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    transition:
+      color 140ms ease,
+      background-color 140ms ease;
+  }
+
+  .nav-links a:hover,
+  .nav-links a:focus-visible {
+    color: var(--text);
+    background: rgba(17, 17, 17, 0.07);
+  }
+
+  @media (max-width: 720px) {
+    .nav {
+      align-items: flex-start;
+      flex-direction: column;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 0;
+    }
+
+    .nav-links {
+      width: 100%;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      gap: 4px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: thin;
+    }
+
+    .nav-links a {
+      flex: 0 0 auto;
+      padding: 6px 8px;
+      font-size: 0.85rem;
+    }
+  }
+</style>

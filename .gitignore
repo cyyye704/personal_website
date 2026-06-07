@@ -1,0 +1,15 @@
+#dependence
+node_modules/
+
+#build output
+dist/
+
+#generated
+.astro/
+
+
+.env
+.DS_Store
+
+.astro-dev.log
+*.log

@@ -1,0 +1,44 @@
+---
+interface Props {
+  title: string;
+  index: number;
+}
+
+const { title, index } = Astro.props;
+const paddedIndex = String(index + 1).padStart(2, "0");
+---
+
+<article class="card method-card">
+  <span>{paddedIndex}</span>
+  <h3>{title}</h3>
+  <a href="#" aria-label={`查看文章：${title}`}>阅读占位</a>
+</article>
+
+<style>
+  .method-card {
+    display: grid;
+    min-height: 168px;
+    grid-template-rows: auto 1fr auto;
+    gap: 18px;
+    padding: 22px;
+  }
+
+  span {
+    color: var(--text-muted);
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    font-size: 0.84rem;
+  }
+
+  h3 {
+    margin: 0;
+  }
+
+  a {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  a:hover {
+    color: var(--text);
+  }
+</style>
