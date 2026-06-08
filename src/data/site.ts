@@ -2,7 +2,7 @@ export const site = {
   owner: "岳宸亿",
   title: "岳宸亿 | Engineering, AI, and Long-term Systems",
   description:
-    "电子信息工程本科生，关注人工智能、无线通信、工程实践、个人方法论与长期成长。",
+    "Undergraduate student at BJTU.",
   email: "your-email@example.com",
   github: "https://github.com/your-name",
 };
