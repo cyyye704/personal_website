@@ -2,13 +2,12 @@
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import MethodCard from "../components/MethodCard.astro";
-import PlatformLink from "../components/PlatformLink.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import ResourceGroup from "../components/ResourceGroup.astro";
 import SectionHeading from "../components/SectionHeading.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
 import {
-  methodologies,
   navItems,
   news,
   platforms,
@@ -16,6 +15,10 @@ import {
   resources,
   site,
 } from "../data/site";
+
+const methodologyEntries = (await getCollection("methodology")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
 ---
 
 <BaseLayout>
@@ -26,8 +29,34 @@ import {
       <section class="hero">
         <div class="container hero-inner">
           <div class="hero-copy">
-            <p class="eyebrow">Personal Site / Research Log</p>
-            <h1>{site.title}</h1>
+            <h1 class="hero-title">{site.title}</h1>
+            <div class="platform-links" aria-label="媒体平台链接">
+              {
+                platforms.map((platform) =>
+                  platform.action === "wechat" ? (
+                    <button
+                      class="platform-link"
+                      type="button"
+                      data-wechat-trigger
+                      aria-controls="wechat-panel"
+                      aria-expanded="false"
+                    >
+                      <span class="platform-icon" aria-hidden="true">
+                        {platform.icon}
+                      </span>
+                      <span>{platform.name}</span>
+                    </button>
+                  ) : (
+                    <a class="platform-link" href={platform.href}>
+                      <span class="platform-icon" aria-hidden="true">
+                        {platform.icon}
+                      </span>
+                      <span>{platform.name}</span>
+                    </a>
+                  )
+                )
+              }
+            </div>
             <p class="hero-description">{site.description}</p>
             <div class="hero-actions" aria-label="页面栏目导航">
               {navItems.map((item) => <a href={item.href}>{item.label}</a>)}
@@ -37,7 +66,7 @@ import {
           <div class="signal-panel" aria-label="个人方向概览">
             <div>
               <span>Focus</span>
-              <strong>AI × Wireless</strong>
+              <strong>AI × Engineering</strong>
             </div>
             <div>
               <span>Mode</span>
@@ -56,7 +85,6 @@ import {
           <SectionHeading
             eyebrow="Projects"
             title="项目"
-            lede="记录研究探索、工程仿真和个人系统建设。这里先放占位项目，后续可替换为真实仓库、论文或笔记链接。"
           />
           <div class="grid two">
             {projects.map((project) => <ProjectCard {...project} />)}
@@ -69,12 +97,21 @@ import {
           <SectionHeading
             eyebrow="Methodology"
             title="方法论"
-            lede="沉淀关于决策、注意力、学习系统和项目推进的长期思考。"
           />
-          <div class="grid four methodology-grid">
+          <div
+            class="methodology-strip"
+            data-drag-strip
+            aria-label="方法论条目"
+          >
             {
-              methodologies.map((title, index) => (
-                <MethodCard title={title} index={index} />
+              methodologyEntries.map((entry, index) => (
+                <div class="methodology-item">
+                  <MethodCard
+                    title={entry.data.title}
+                    href={`/methodology/${entry.slug}/`}
+                    index={index}
+                  />
+                </div>
               ))
             }
           </div>
@@ -86,7 +123,6 @@ import {
           <SectionHeading
             eyebrow="Resources"
             title="资料推荐"
-            lede="按主题整理书籍、课程、工具和网站，方便后续扩展成长期资料库。"
           />
           <div class="grid two">
             {
@@ -98,25 +134,11 @@ import {
         </div>
       </section>
 
-      <section class="section" id="platforms">
-        <div class="container">
-          <SectionHeading
-            eyebrow="Platforms"
-            title="自媒体平台"
-            lede="把公开输出、代码项目和长文内容集中到一个简洁入口。"
-          />
-          <div class="grid three">
-            {platforms.map((platform) => <PlatformLink {...platform} />)}
-          </div>
-        </div>
-      </section>
-
       <section class="section news-section" id="news">
         <div class="container">
           <SectionHeading
             eyebrow="News"
             title="新闻"
-            lede="这里用于记录个人动态和更新日志，不接入外部实时新闻源。"
           />
           <ol class="timeline" aria-label="个人动态">
             {
@@ -132,9 +154,123 @@ import {
       </section>
     </main>
 
+    <div class="wechat-overlay" data-wechat-overlay hidden></div>
+    <aside
+      class="wechat-panel"
+      id="wechat-panel"
+      data-wechat-panel
+      aria-hidden="true"
+    >
+      <button
+        class="wechat-close"
+        type="button"
+        data-wechat-close
+        aria-label="关闭微信二维码"
+      >
+        ×
+      </button>
+      <div class="wechat-card">
+        <img src="/wechat-qr.png" alt="微信二维码" loading="lazy" />
+      </div>
+    </aside>
+
     <Footer />
   </div>
 </BaseLayout>
+
+<script>
+  const wechatTrigger = document.querySelector("[data-wechat-trigger]");
+  const wechatOverlay = document.querySelector("[data-wechat-overlay]");
+  const wechatPanel = document.querySelector("[data-wechat-panel]");
+  const wechatClose = document.querySelector("[data-wechat-close]");
+
+  const setWechatOpen = (isOpen) => {
+    if (!wechatTrigger || !wechatOverlay || !wechatPanel) {
+      return;
+    }
+
+    wechatOverlay.hidden = !isOpen;
+    wechatOverlay.classList.toggle("is-open", isOpen);
+    wechatPanel.classList.toggle("is-open", isOpen);
+    wechatPanel.setAttribute("aria-hidden", String(!isOpen));
+    wechatTrigger.setAttribute("aria-expanded", String(isOpen));
+    document.documentElement.classList.toggle("wechat-open", isOpen);
+  };
+
+  wechatTrigger?.addEventListener("click", () => {
+    const isOpen = wechatPanel?.classList.contains("is-open") ?? false;
+    setWechatOpen(!isOpen);
+  });
+
+  wechatOverlay?.addEventListener("click", () => setWechatOpen(false));
+  wechatClose?.addEventListener("click", () => setWechatOpen(false));
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      setWechatOpen(false);
+    }
+  });
+
+  const dragStrip = document.querySelector<HTMLElement>("[data-drag-strip]");
+  let dragStartX = 0;
+  let dragStartScrollLeft = 0;
+  let isPendingStripDrag = false;
+  let shouldSuppressStripClick = false;
+
+  dragStrip?.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0 || event.pointerType !== "mouse") {
+      return;
+    }
+
+    isPendingStripDrag = true;
+    shouldSuppressStripClick = false;
+    dragStartX = event.clientX;
+    dragStartScrollLeft = dragStrip.scrollLeft;
+  });
+
+  dragStrip?.addEventListener("pointermove", (event) => {
+    if (!isPendingStripDrag || !dragStrip) {
+      return;
+    }
+
+    const distance = event.clientX - dragStartX;
+    if (Math.abs(distance) <= 6) {
+      return;
+    }
+
+    event.preventDefault();
+    shouldSuppressStripClick = true;
+    dragStrip.classList.add("is-dragging");
+    dragStrip.scrollLeft = dragStartScrollLeft - distance;
+  });
+
+  const stopDraggingStrip = () => {
+    if (!isPendingStripDrag || !dragStrip) {
+      return;
+    }
+
+    isPendingStripDrag = false;
+    dragStrip.classList.remove("is-dragging");
+    window.setTimeout(() => {
+      shouldSuppressStripClick = false;
+    }, 0);
+  };
+
+  window.addEventListener("pointerup", stopDraggingStrip);
+  window.addEventListener("pointercancel", stopDraggingStrip);
+  dragStrip?.addEventListener(
+    "click",
+    (event) => {
+      if (!shouldSuppressStripClick) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+    },
+    true,
+  );
+</script>
 
 <style>
   .hero {
@@ -152,6 +288,66 @@ import {
 
   .hero-copy {
     min-width: 0;
+  }
+
+  .hero-title {
+    max-width: 760px;
+    font-size: clamp(2.2rem, 5.1vw, 4.4rem);
+    line-height: 1.04;
+  }
+
+  .platform-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0 0 24px;
+  }
+
+  .platform-link {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    gap: 8px;
+    padding: 7px 12px 7px 8px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--text);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 700;
+    line-height: 1;
+    transition:
+      background-color 140ms ease,
+      border-color 140ms ease,
+      transform 140ms ease;
+  }
+
+  .platform-link:hover {
+    transform: translateY(-2px);
+    border-color: var(--line-strong);
+    background: var(--surface);
+  }
+
+  .platform-link:focus-visible,
+  .wechat-close:focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 3px;
+  }
+
+  .platform-icon {
+    display: grid;
+    width: 22px;
+    height: 22px;
+    flex: 0 0 auto;
+    place-items: center;
+    border-radius: 5px;
+    color: var(--surface);
+    background: var(--text);
+    font-size: 0.74rem;
+    line-height: 1;
   }
 
   .hero-description {
@@ -233,8 +429,27 @@ import {
     font-size: 1.05rem;
   }
 
-  .methodology-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  .methodology-strip {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding: 2px 0 14px;
+    cursor: grab;
+    scroll-snap-type: x proximity;
+    scrollbar-color: var(--line-strong) transparent;
+    scrollbar-width: thin;
+    user-select: none;
+  }
+
+  .methodology-strip.is-dragging {
+    cursor: grabbing;
+    scroll-snap-type: none;
+  }
+
+  .methodology-item {
+    flex: 0 0 clamp(236px, 28vw, 292px);
+    scroll-snap-align: start;
   }
 
   .news-section {
@@ -263,6 +478,80 @@ import {
     font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   }
 
+  :global(html.wechat-open) {
+    overflow: hidden;
+  }
+
+  .wechat-overlay {
+    position: fixed;
+    z-index: 40;
+    inset: 0;
+    background: rgba(17, 17, 17, 0.32);
+    opacity: 0;
+    transition: opacity 180ms ease;
+  }
+
+  .wechat-overlay.is-open {
+    opacity: 1;
+  }
+
+  .wechat-panel {
+    position: fixed;
+    z-index: 45;
+    top: 0;
+    right: 0;
+    display: flex;
+    width: min(420px, 42vw);
+    height: 100dvh;
+    align-items: center;
+    justify-content: center;
+    padding: calc(var(--header-height) + 28px) 28px 28px;
+    border-left: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: -24px 0 60px rgba(17, 17, 17, 0.14);
+    transform: translateX(100%);
+    transition: transform 220ms ease;
+  }
+
+  .wechat-panel.is-open {
+    transform: translateX(0);
+  }
+
+  .wechat-close {
+    appearance: none;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: grid;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    font: inherit;
+    font-size: 1.2rem;
+    line-height: 1;
+  }
+
+  .wechat-card {
+    display: grid;
+    width: min(100%, 360px);
+    aspect-ratio: 827 / 1103;
+    place-items: center;
+  }
+
+  .wechat-card img {
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    object-fit: contain;
+  }
+
   @media (max-width: 960px) {
     .hero-inner {
       grid-template-columns: 1fr;
@@ -282,8 +571,8 @@ import {
       border-right: 0;
     }
 
-    .methodology-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+    .methodology-item {
+      flex-basis: clamp(220px, 40vw, 280px);
     }
   }
 
@@ -298,13 +587,44 @@ import {
       gap: 36px;
     }
 
+    .hero-title {
+      font-size: clamp(2rem, 12vw, 3rem);
+    }
+
     .hero-actions a {
       flex: 1 1 calc(50% - 10px);
       justify-content: center;
     }
 
-    .signal-panel,
-    .methodology-grid {
+    .wechat-panel {
+      top: auto;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: min(82dvh, 680px);
+      padding: 52px 20px 24px;
+      border-top: 1px solid var(--line);
+      border-left: 0;
+      border-radius: 8px 8px 0 0;
+      box-shadow: 0 -24px 60px rgba(17, 17, 17, 0.16);
+      transform: translateY(100%);
+    }
+
+    .wechat-panel.is-open {
+      transform: translateY(0);
+    }
+
+    .wechat-card {
+      width: min(78vw, 320px);
+      max-height: calc(82dvh - 96px);
+    }
+
+    .methodology-item {
+      flex-basis: min(82vw, 280px);
+    }
+
+    .signal-panel {
       grid-template-columns: 1fr;
     }
 

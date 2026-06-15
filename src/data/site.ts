@@ -3,15 +3,14 @@ export const site = {
   title: "岳宸亿 | Engineering, AI, and Long-term Systems",
   description:
     "Undergraduate student at BJTU.",
-  email: "your-email@example.com",
-  github: "https://github.com/your-name",
+  email: "cyyue7048@outlook.com",
+  github: "https://github.com/cyyye704",
 };
 
 export const navItems = [
   { label: "项目", href: "#projects" },
   { label: "方法论", href: "#methodology" },
   { label: "资料推荐", href: "#resources" },
-  { label: "自媒体平台", href: "#platforms" },
   { label: "新闻", href: "#news" },
 ];
 
@@ -34,13 +33,6 @@ export const projects = [
     tags: ["PKM", "Workflow", "Writing"],
     status: "计划中",
   },
-];
-
-export const methodologies = [
-  "如何做长期决策",
-  "如何管理注意力",
-  "如何构建个人学习系统",
-  "如何在不确定性中推进项目",
 ];
 
 export const resources = [
@@ -107,12 +99,16 @@ export const resources = [
 ];
 
 export const platforms = [
-  { name: "Bilibili", href: "#", handle: "视频与学习记录" },
-  { name: "小红书", href: "#", handle: "学习、成长与生活观察" },
-  { name: "GitHub", href: site.github, handle: "代码与项目沉淀" },
-  { name: "微信公众号", href: "#", handle: "长文与阶段复盘" },
-  { name: "YouTube", href: "#", handle: "国际化内容占位" },
-  { name: "Twitter / X", href: "#", handle: "短动态与链接分享" },
+  {
+    name: "bilibili",
+    href: "https://space.bilibili.com/402433321?spm_id_from=333.1007.0.0",
+    icon: "B",
+    action: "link",
+  },
+  { name: "微信", href: "#", icon: "微", action: "wechat" },
+  { name: "微信公众号", href: "#", icon: "公", action: "link" },
+  { name: "抖音", href: "#", icon: "抖", action: "link" },
+  { name: "简历", href: "/resume/resume.pdf", icon: "简", action: "link" },
 ];
 
 export const news = [

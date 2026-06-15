@@ -5,7 +5,6 @@ import { navItems, site } from "../data/site";
 <header class="site-header">
   <nav class="container nav" aria-label="主导航">
     <a class="brand" href="#top" aria-label="返回首页">
-      <span class="brand-mark">YCY</span>
       <span>{site.owner}</span>
     </a>
     <div class="nav-links">
@@ -42,18 +41,6 @@ import { navItems, site } from "../data/site";
     color: var(--text);
     font-weight: 800;
     white-space: nowrap;
-  }
-
-  .brand-mark {
-    display: grid;
-    width: 36px;
-    height: 36px;
-    place-items: center;
-    border: 1px solid var(--text);
-    border-radius: 6px;
-    color: var(--surface);
-    background: var(--text);
-    font-size: 0.74rem;
   }
 
   .nav-links {
