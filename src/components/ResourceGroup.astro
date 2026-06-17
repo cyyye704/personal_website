@@ -1,8 +1,8 @@
 ---
 interface Resource {
   name: string;
-  description: string;
-  href: string;
+  description?: string;
+  href?: string;
 }
 
 interface Props {
@@ -11,21 +11,77 @@ interface Props {
 }
 
 const { category, items } = Astro.props;
+const isScrollable = items.length > 2;
 ---
 
 <article class="resource-group">
   <h3>{category}</h3>
-  <div class="resource-list">
+  <div class:list={["resource-list-shell", { "has-progress": isScrollable }]}>
+    <div class:list={["resource-list", { "is-scrollable": isScrollable }]} data-resource-scroll={isScrollable ? "true" : undefined}>
+      {
+        items.map((item) =>
+          item.href ? (
+            <a class="card resource-card" href={item.href}>
+              <strong>{item.name}</strong>
+              {item.description && <span>{item.description}</span>}
+            </a>
+          ) : (
+            <div class="card resource-card">
+              <strong>{item.name}</strong>
+              {item.description && <span>{item.description}</span>}
+            </div>
+          )
+        )
+      }
+    </div>
     {
-      items.map((item) => (
-        <a class="card resource-card" href={item.href}>
-          <strong>{item.name}</strong>
-          <span>{item.description}</span>
-        </a>
-      ))
+      isScrollable && (
+        <div class="scroll-progress" aria-hidden="true">
+          <span></span>
+        </div>
+      )
     }
   </div>
 </article>
+
+<script>
+  const updateResourceProgress = (list) => {
+    const shell = list.closest(".resource-list-shell");
+    if (!shell) {
+      return;
+    }
+
+    const scrollRange = list.scrollHeight - list.clientHeight;
+    const progressHeight =
+      list.scrollHeight > 0
+        ? Math.max((list.clientHeight / list.scrollHeight) * list.clientHeight, 28)
+        : list.clientHeight;
+    const progressTop =
+      scrollRange > 0
+        ? (list.scrollTop / scrollRange) * (list.clientHeight - progressHeight)
+        : 0;
+
+    shell.style.setProperty("--progress-height", `${progressHeight}px`);
+    shell.style.setProperty("--progress-top", `${progressTop}px`);
+  };
+
+  const setupResourceProgress = () => {
+    document.querySelectorAll("[data-resource-scroll='true']").forEach((list) => {
+      updateResourceProgress(list);
+      if (list.dataset.resourceProgressReady === "true") {
+        return;
+      }
+
+      list.dataset.resourceProgressReady = "true";
+      list.addEventListener("scroll", () => updateResourceProgress(list), {
+        passive: true,
+      });
+    });
+  };
+
+  setupResourceProgress();
+  window.addEventListener("resize", setupResourceProgress);
+</script>
 
 <style>
   .resource-group {
@@ -34,19 +90,75 @@ const { category, items } = Astro.props;
   }
 
   h3 {
+    display: flex;
+    min-height: 1.42em;
+    align-items: center;
     margin: 0;
     color: #2a2a2a;
   }
 
+  .resource-list-shell {
+    position: relative;
+  }
+
   .resource-list {
+    --resource-card-height: 112px;
+    --resource-list-gap: 12px;
+
     display: grid;
-    gap: 12px;
+    gap: var(--resource-list-gap);
+  }
+
+  .resource-list.is-scrollable {
+    max-height: calc((var(--resource-card-height) * 2) + var(--resource-list-gap));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+
+  .resource-list.is-scrollable::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scroll-progress {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    display: none;
+    width: 3px;
+    border-radius: 999px;
+    background: var(--surface-muted);
+  }
+
+  .resource-group:nth-child(odd) .scroll-progress {
+    left: -12px;
+  }
+
+  .resource-group:nth-child(even) .scroll-progress {
+    right: -12px;
+  }
+
+  .resource-list-shell.has-progress .scroll-progress {
+    display: block;
+  }
+
+  .scroll-progress span {
+    position: absolute;
+    top: var(--progress-top, 0);
+    right: 0;
+    left: 0;
+    height: var(--progress-height, 28px);
+    border-radius: inherit;
+    background: var(--line-strong);
   }
 
   .resource-card {
     display: grid;
+    height: var(--resource-card-height);
+    align-content: start;
     gap: 8px;
     padding: 18px;
+    background: var(--surface);
   }
 
   strong {
@@ -56,5 +168,13 @@ const { category, items } = Astro.props;
   span {
     color: var(--text-muted);
     font-size: 0.92rem;
+  }
+
+  @media (max-width: 820px) {
+    .resource-group:nth-child(odd) .scroll-progress,
+    .resource-group:nth-child(even) .scroll-progress {
+      right: -10px;
+      left: auto;
+    }
   }
 </style>

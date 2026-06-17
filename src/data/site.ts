@@ -40,9 +40,9 @@ export const resources = [
     category: "AI / Deep Learning",
     items: [
       {
-        name: "Deep Learning Book",
+        name: "Deep Learning",
         description: "系统理解深度学习基础概念与数学框架。",
-        href: "#",
+        href: "/resources/deep-learning/",
       },
       {
         name: "PyTorch Documentation",
@@ -52,17 +52,36 @@ export const resources = [
     ],
   },
   {
-    category: "Communication / Wireless",
+    category: "数学物理基础",
     items: [
       {
-        name: "Wireless Communications",
-        description: "无线通信系统、信道建模和接收机设计基础。",
-        href: "#",
+        name: "微积分",
       },
       {
-        name: "Sionna",
-        description: "用于链路级仿真和可学习通信系统研究的工具。",
-        href: "#",
+        name: "线性代数",
+      },
+      {
+        name: "概率论与统计",
+      },
+      {
+        name: "随机过程",
+      },
+    ],
+  },
+  {
+    category: "电类课程",
+    items: [
+      {
+        name: "电路分析",
+      },
+      {
+        name: "信号与系统",
+      },
+      {
+        name: "模拟电子技术",
+      },
+      {
+        name: "数字电子技术",
       },
     ],
   },
